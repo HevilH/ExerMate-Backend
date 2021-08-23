@@ -6,11 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ExerPost {
     String id;
     String exerPostID;
+    String exerName;
     String useremail;
-    String chatRoomID;
-    String uploadTime;
-    String meetingPlace;
-    String meetingTime;
+    Long uploadTime;
+    String exerPlace;
+    Long exerTime;
     int maxNum;
     String contents;
 
@@ -25,7 +25,7 @@ public class ExerPost {
         return exerPostID;
     }
     public void setExerPostID(String exerPostID) {
-        this.exerPostID = id;
+        this.exerPostID = exerPostID;
     }
 
     public String getUserEmail() { return useremail; }
@@ -33,30 +33,30 @@ public class ExerPost {
         this.useremail = useremail;
     }
 
-    public String getChatRoomID() {
-        return chatRoomID;
+    public String getExerName() {
+        return exerName;
     }
-    public void setChatRoomID(String exerPostID) {
-        this.chatRoomID = id;
+    public void setExerName(String exerName) {
+        this.exerName = exerName;
     }
 
-    public String getUploadTime() {
+    public Long getUploadTime() {
         return uploadTime;
     }
-    public void setPassword(String uploadTime) {
+    public void setUploadTime(Long uploadTime) {
         this.uploadTime = uploadTime;
     }
 
-    public String getMeetingPlace() {
-        return meetingPlace;
+    public String getExerPlace() {
+        return exerPlace;
     }
-    public void setMeetingPlace(String meetingPlace) {
-        this.meetingPlace = meetingPlace;
+    public void setExerPlace(String exerPlace) {
+        this.exerPlace = exerPlace;
     }
 
-    public String getMeetingTime() { return meetingTime; }
-    public void setMeetingTime(String meetingTime) {
-        this.meetingTime = meetingTime;
+    public Long getExerTime() { return exerTime; }
+    public void setExerTime(Long exerTime) {
+        this.exerTime = exerTime;
     }
 
     public int getMaxNum() {

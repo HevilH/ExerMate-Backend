@@ -26,10 +26,9 @@ public class ChatRoomProcessor {
         return mongoTemplate.findOne(query, ChatRoom.class);
     }
 
-    public void makeChatRoom(String hostemail, String chatRoomName){
+    public void createChatRoom(String hostemail,  String chatRoomID, String chatRoomName){
         ChatRoom newChatRoom = new ChatRoom();
-        Date date = new Date();
-        newChatRoom.setChatRoomID(hostemail + date);
+        newChatRoom.setChatRoomID(chatRoomID);
         newChatRoom.setHostEmail(hostemail);
         newChatRoom.setChatRoomName(chatRoomName);
         newChatRoom.initGuestemails();
@@ -41,6 +40,6 @@ public class ChatRoomProcessor {
         query.addCriteria(Criteria.where(KeyConstant.CHATROOMID).is(chatRoomID));
         Update update = new Update();
         update.push("guestemails", guestemail);
-        mongoTemplate.updateFirst(query, update, User.class);
+        mongoTemplate.updateFirst(query, update, ChatRoom.class);
     }
 }

@@ -7,14 +7,25 @@ import ExerMate.ExerMate.Base.Constant.NameConstant;
 import ExerMate.ExerMate.Base.Error.CourseWarn;
 import ExerMate.ExerMate.Base.Error.UserWarnEnum;
 import ExerMate.ExerMate.Base.Model.User;
+
 import ExerMate.ExerMate.Biz.Controller.Params.CommonOutParams;
+import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.GetChatRoomOutParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.SetProfileOutParams;
+import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.GetDataOutParams;
+import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.GetWalkRecordOutParams;
+
+import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.LoginInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.SignupInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.SetProfileInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.SetStatusMSGInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.AddWalkRecordInParams;
+import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.JoinChatRoomInParams;
+
 import ExerMate.ExerMate.Biz.Processor.UserProcessor;
+import ExerMate.ExerMate.Biz.Processor.ChatRoomProcessor;
+import ExerMate.ExerMate.Frame.Util.RedisUtil;
+
 import ExerMate.ExerMate.Frame.Util.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.multipart.FileUpload;
@@ -25,6 +36,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+
+import java.util.List;
 
 /**
  * 유저 컨트롤러, 유저의 관한 비즈니스를 처리
@@ -34,8 +48,13 @@ public class UserController {
 
     @Autowired
     UserProcessor userProcessor;
+    @Autowired
+    ChatRoomProcessor chatRoomProcessor;
 
-    /** 유저 로그인 비즈니스 */
+    @Autowired
+    RedisUtil redisUtil;
+
+    /** AUTH */
     @BizType(BizTypeEnum.USER_LOGIN)
     public CommonOutParams userLogin(LoginInParams inParams) throws Exception {
         String useremail = inParams.getUseremail();
@@ -59,7 +78,6 @@ public class UserController {
         return new CommonOutParams(true);
     }
 
-    /** 유저 회원가입 비즈니스*/
     @BizType(BizTypeEnum.USER_SIGNUP)
     public CommonOutParams userSignup(SignupInParams inParams) throws Exception {
         String useremail = inParams.getUseremail();
@@ -69,10 +87,11 @@ public class UserController {
         User user = userProcessor.getUserByUseremail(useremail);
         if(user != null)
             throw new CourseWarn(UserWarnEnum.EXISTED_EMAIL);
-        userProcessor.addUser(useremail, inParams.getPassword(), inParams.getNickName());
+        userProcessor.createUser(useremail, inParams.getPassword(), inParams.getNickName());
         return new CommonOutParams(true);
     }
 
+    /** POST */
     @NeedLogin
     @BizType(BizTypeEnum.USER_SET_PROFILE)
     public CommonOutParams userSetProfile(SetProfileInParams inParams) throws Exception {
@@ -108,12 +127,71 @@ public class UserController {
 
     @NeedLogin
     @BizType(BizTypeEnum.USER_ADD_WALKRECORD)
-    public CommonOutParams userSetProfile(AddWalkRecordInParams inParams) throws Exception {
+    public CommonOutParams userAddWalkRecord(AddWalkRecordInParams inParams) throws Exception {
         String useremail = inParams.getUseremail();
         User.WalkNum walkNum = new User.WalkNum();
         walkNum.setWalkNum(inParams.getWalkNum());
         walkNum.setDate(inParams.getDate());
         userProcessor.addWalkNum(useremail, walkNum);
         return new CommonOutParams(true);
+    }
+
+
+    @NeedLogin
+    @BizType(BizTypeEnum.USER_JOIN_CHATROOM)
+    public CommonOutParams userJoinChatRoom(JoinChatRoomInParams inParams) throws Exception {
+        String useremail = inParams.getUseremail();
+        String chatRoomID = inParams.getChatRoomID();
+        String chatRoomName = inParams.getChatRoomName();
+        userProcessor.joinChatRoom(useremail, chatRoomID, chatRoomName);
+        chatRoomProcessor.addGuest(chatRoomID, useremail);
+        redisUtil.addToSet(chatRoomID, useremail);
+        return new CommonOutParams(true);
+    }
+
+    /** Get */
+    @NeedLogin
+    @BizType(BizTypeEnum.USER_GET_DATA)
+    public CommonOutParams userGetData(CommonInParams inParams) throws Exception {
+        GetDataOutParams outParams = new GetDataOutParams();
+        User nowUser = ThreadUtil.getUser();
+        outParams.setNickName(nowUser.getNickName());
+        outParams.setProfileRoute(nowUser.getProfileRoute());
+        outParams.setStatusMsg(nowUser.getStatusMsg());
+        outParams.setSuccess(true);
+        return outParams;
+    }
+
+
+    @NeedLogin
+    @BizType(BizTypeEnum.USER_GET_WALKRECORD)
+    public List<CommonOutParams> userGetWalkRecord(CommonInParams inParams) throws Exception {
+        List<CommonOutParams> retParams = new ArrayList<>();
+        User nowUser = ThreadUtil.getUser();
+        User.WalkNum [] walkRecord = nowUser.getWalkRecord();
+        for (int i = 0; i < walkRecord.length; i++){
+            GetWalkRecordOutParams outParams = new GetWalkRecordOutParams();
+            outParams.setWalkNum(walkRecord[i].getWalkNum());
+            outParams.setDate(walkRecord[i].getDate());
+            outParams.setSuccess(true);
+            retParams.add(outParams);
+        }
+        return retParams;
+    }
+
+    @NeedLogin
+    @BizType(BizTypeEnum.USER_GET_CHATROOM)
+    public List<CommonOutParams> userGetChatRoom(CommonInParams inParams) throws Exception {
+        List<CommonOutParams> retParams = new ArrayList<>();
+        User nowUser = ThreadUtil.getUser();
+        User.ChatRoom [] chatRooms = nowUser.getChatRooms();
+        for (int i = 0; i < chatRooms.length; i++){
+            GetChatRoomOutParams outParams = new GetChatRoomOutParams();
+            outParams.setChatRoomID(chatRooms[i].getChatRoomID());
+            outParams.setChatRoomName(chatRooms[i].getChatRoomName());
+            outParams.setSuccess(true);
+            retParams.add(outParams);
+        }
+        return retParams;
     }
 }

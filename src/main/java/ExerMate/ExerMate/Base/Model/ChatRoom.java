@@ -24,7 +24,7 @@ public class ChatRoom {
     public String getChatRoomName() {
         return chatRoomName;
     }
-    public void setChatRoomName(String chatRoomName) { this.chatRoomID = chatRoomName; }
+    public void setChatRoomName(String chatRoomName) { this.chatRoomName = chatRoomName; }
 
     public String getHostEmail() {
         return hostemail;
@@ -37,6 +37,5 @@ public class ChatRoom {
     public void setGuestemails(String[] guestemails) {
         this.guestemails = guestemails;
     }
-
     public void initGuestemails() { this.guestemails = new String[0]; }
 }

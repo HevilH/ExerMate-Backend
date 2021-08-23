@@ -8,11 +8,11 @@ import io.netty.channel.ChannelHandlerContext;
  **/
 public class ThreadUtil {
     private static class ThreadParams {
-        /** 当前用户 */
+
         private User nowUser = null;
-        /** WebSocket管道，在WebSocket长连接中生效 */
+
         private ChannelHandlerContext channelHandlerContext = null;
-        /** HTTPSession，在http请求中生效 */
+
         private HttpSession httpSession;
 
         public User getNowUser() {

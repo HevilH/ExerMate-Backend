@@ -2,49 +2,78 @@ package ExerMate.ExerMate.Biz.Controller;
 
 import ExerMate.ExerMate.Base.Annotation.NeedLogin;
 import ExerMate.ExerMate.Base.Annotation.BizType;
-import ExerMate.ExerMate.Biz.BizTypeEnum;
-import ExerMate.ExerMate.Base.Constant.NameConstant;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
-import ExerMate.ExerMate.Base.Error.UserWarnEnum;
 import ExerMate.ExerMate.Base.Model.User;
+import ExerMate.ExerMate.Biz.BizTypeEnum;
+import ExerMate.ExerMate.Base.Model.ChatRoom;
+import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.Out.SendMsgOutParams;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonOutParams;
-import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.In.EnterInParams;
-import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.In.MakeInParams;
+import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.In.GetUserListInParams;
+import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.Out.GetUserListOutParams;
+import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.In.SendMsgInParams;
+import ExerMate.ExerMate.Biz.Processor.UserProcessor;
 import ExerMate.ExerMate.Biz.Processor.ChatRoomProcessor;
-import ExerMate.ExerMate.Frame.Util.*;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.multipart.FileUpload;
+import ExerMate.ExerMate.Frame.Util.RedisUtil;
+import ExerMate.ExerMate.Frame.Util.SocketUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 @Component
 public class ChatRoomController {
 
     @Autowired
     ChatRoomProcessor chatRoomProcessor;
+    @Autowired
+    UserProcessor userProcessor;
+
+    @Autowired
+    RedisUtil redisUtil;
 
     @NeedLogin
-    @BizType(BizTypeEnum.CHATROOM_MAKE)
-    public CommonOutParams chatRoomMake(MakeInParams inParams) throws Exception{
-        String hostemail = inParams.getUseremail();
-        String chatRoomName = inParams.getChatRoomName();
-        chatRoomProcessor.makeChatRoom(hostemail, chatRoomName);
-        return new CommonOutParams(true);
-    }
-
-    @NeedLogin
-    @BizType(BizTypeEnum.CHATROOM_ENTER)
-    public CommonOutParams chatRoomEnter(EnterInParams inParams) throws Exception{
-        String guestemail = inParams.getUseremail();
+    @BizType(BizTypeEnum.CHATROOM_GET_USERLIST)
+    public List<CommonOutParams> chatRoomGetUserList(GetUserListInParams inParams) throws Exception{
+        List<CommonOutParams> retParams = new ArrayList<>();
         String chatRoomID = inParams.getChatRoomID();
-        chatRoomProcessor.addGuest(chatRoomID, guestemail);
+        ChatRoom chatRoom = chatRoomProcessor.getChatRoomByID(chatRoomID);
+
+        User user = userProcessor.getUserByUseremail(chatRoom.getHostEmail());
+        GetUserListOutParams outParams = new GetUserListOutParams();
+        outParams.setUseremail(user.getUserEmail());
+        outParams.setNickName(user.getNickName());
+        outParams.setProfileRoute(user.getProfileRoute());
+        outParams.setSuccess(true);
+        retParams.add(outParams);
+        String [] guestemails = chatRoom.getGuestemails();
+        for (int i = 0; i < guestemails.length; i++){
+            outParams = new GetUserListOutParams();
+            user = userProcessor.getUserByUseremail(guestemails[i]);
+            outParams.setUseremail(user.getUserEmail());
+            outParams.setNickName(user.getNickName());
+            outParams.setProfileRoute(user.getProfileRoute());
+            outParams.setSuccess(true);
+            retParams.add(outParams);
+        }
+        return retParams;
+    }
+
+    @BizType(BizTypeEnum.SEND_MSG)
+    public CommonOutParams sendMSG(SendMsgInParams inParams) throws Exception {
+        String useremail = inParams.getUseremail();
+        SendMsgOutParams outParams = new SendMsgOutParams();
+        outParams.setChatRoomID(inParams.getChatRoomID());
+        outParams.setBizType("SEND_MSG");
+        outParams.setUseremail(useremail);
+        outParams.setText(inParams.getText());
+        outParams.setSuccess(true);
+        Set<String> chatRoomUsers = redisUtil.getSet(inParams.getChatRoomID());
+        for(String chatRoomUser : chatRoomUsers){
+            if(!useremail.equals(chatRoomUser))
+                SocketUtil.sendMessageToUser(chatRoomUser, outParams);
+        }
         return new CommonOutParams(true);
     }
 
-    @NeedLogin
-    @BizType(BizTypeEnum.SEND_MSG)
-    public CommonOutParams chatRoomEnter(CommonInParams inParams) throws Exception{
-        return new CommonOutParams(true);
-    }
 }

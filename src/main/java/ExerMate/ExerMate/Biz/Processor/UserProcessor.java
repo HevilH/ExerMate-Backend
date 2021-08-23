@@ -11,8 +11,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * @描述 모든 유저의 원자적 트랜잭션을 처리함
@@ -30,7 +28,7 @@ public class UserProcessor {
     }
 
     /**새로운 유저 추가*/
-    public void addUser(String useremail, String password, String nickName) {
+    public void createUser(String useremail, String password, String nickName) {
         User newUser = new User();
         newUser.setUserEmail(useremail);
         newUser.setPassword(password);
@@ -38,6 +36,7 @@ public class UserProcessor {
         newUser.setProfileRoute("");
         newUser.setStatusMsg("");
         newUser.initWalkRecord();
+        newUser.initChatRooms();
         newUser.setUserType(UserType.NORMAL);
         mongoTemplate.insert(newUser, "User");
     }
@@ -64,6 +63,17 @@ public class UserProcessor {
         query.addCriteria(Criteria.where(KeyConstant.USEREMAIL).is(useremail));
         Update update = new Update();
         update.push("walkRecord", walkNum);
+        mongoTemplate.updateFirst(query, update, User.class);
+    }
+
+    public void joinChatRoom(String useremail, String chatRoomID, String chatRoomName) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(KeyConstant.USEREMAIL).is(useremail));
+        Update update = new Update();
+        User.ChatRoom chatRoom = new User.ChatRoom();
+        chatRoom.setChatRoomID(chatRoomID);
+        chatRoom.setChatRoomName(chatRoomName);
+        update.push("chatRooms", chatRoom);
         mongoTemplate.updateFirst(query, update, User.class);
     }
 }

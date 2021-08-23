@@ -8,24 +8,24 @@ import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 @BizType(BizTypeEnum.USER_ADD_WALKRECORD)
 public class AddWalkRecordInParams extends CommonInParams {
     @Required
-    private String walkNum;
+    private int walkNum;
 
     @Required
-    private String date;
+    private Long date;
 
-    public String getWalkNum() {
+    public int getWalkNum() {
         return walkNum;
     }
 
-    public void setWalkNum(String walkNum) {
+    public void setWalkNum(int walkNum) {
         this.walkNum = walkNum;
     }
 
-    public String getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(String Date) {
+    public void setDate(Long Date) {
         this.date = date;
     }
 }

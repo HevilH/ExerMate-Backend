@@ -9,17 +9,32 @@ public class User {
 
     public static class WalkNum {
         /** 存储的时间 */
-        String walkNum;
+        int walkNum;
 
-        String date;
+        Long date;
 
-        public String getWalkNum() { return walkNum; }
+        public int getWalkNum() { return walkNum; }
 
-        public void setWalkNum(String walkNum) { this.walkNum = walkNum; }
+        public void setWalkNum(int walkNum) { this.walkNum = walkNum; }
 
-        public String getDate() { return date; }
+        public Long getDate() { return date; }
 
-        public void setDate(String date) { this.date = date; }
+        public void setDate(Long date) { this.date = date; }
+    }
+
+    public static class ChatRoom {
+
+        String chatRoomID;
+
+        String chatRoomName;
+
+        public String getChatRoomID() { return chatRoomID; }
+
+        public void setChatRoomID(String chatRoomID) { this.chatRoomID = chatRoomID; }
+
+        public String getChatRoomName() { return chatRoomName; }
+
+        public void setChatRoomName(String chatRoomName) { this.chatRoomName = chatRoomName; }
     }
 
     String id;
@@ -29,6 +44,7 @@ public class User {
     String profileRoute;
     String statusMsg;
     WalkNum [] walkRecord;
+    ChatRoom [] chatRooms;
     UserType userType;
 
 
@@ -78,10 +94,15 @@ public class User {
     public void setWalkRecord(WalkNum[] walkRecord) {
         this.walkRecord = walkRecord;
     }
-
     public void initWalkRecord(){this.walkRecord = new WalkNum[0];}
-    public UserType getUserType() { return userType; }
 
+    public ChatRoom[] getChatRooms() { return chatRooms; }
+    public void setChatRooms(ChatRoom[] chatRooms) {
+        this.chatRooms = chatRooms;
+    }
+    public void initChatRooms(){this.chatRooms = new ChatRoom[0];}
+
+    public UserType getUserType() { return userType; }
     public void setUserType(UserType userType) {
         this.userType = userType;
     }
