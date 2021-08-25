@@ -3,9 +3,7 @@ package ExerMate.ExerMate.Frame.Util;
 import ExerMate.ExerMate.Base.Model.User;
 import io.netty.channel.ChannelHandlerContext;
 
-/**
- * @描述 线程本地变量的操作组件
- **/
+
 public class ThreadUtil {
     private static class ThreadParams {
 
@@ -80,7 +78,7 @@ public class ThreadUtil {
     public static HttpSession getHttpSession() {
         return getThreadParams().getHttpSession();
     }
-    /** 清除本地线程变量，因为执行业务的线程存在复用情况，所以每次进入业务前需要调用此函数，防止两个业务使用一样的线程变量，导致内部逻辑出错 */
+
     public static void clean() {
         paramsThreadLocal.remove();
     }

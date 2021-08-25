@@ -16,7 +16,7 @@ public class ExerMateApplication implements CommandLineRunner {
     @Autowired
     NettyServer nettyServer;
 
-    /** 서버작동 */
+
     public static void main(String[] args) {
         try {
             SpringApplication.run(ExerMateApplication.class, args);
@@ -30,7 +30,7 @@ public class ExerMateApplication implements CommandLineRunner {
     public void run(String... args){
         /** 시간설정 */
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+9"));
-        /** 监听Http，监听会阻塞线程，需要新建线程 */
+
         new Thread(() -> {
             try {
                 nettyServer.startHttp();
@@ -38,7 +38,7 @@ public class ExerMateApplication implements CommandLineRunner {
                 e.printStackTrace();
             }
         }).start();
-        /** 监听WebSocket，监听会阻塞线程，需要新建线程 */
+
         new Thread(() -> {
             try {
                 nettyServer.startWebSocket();

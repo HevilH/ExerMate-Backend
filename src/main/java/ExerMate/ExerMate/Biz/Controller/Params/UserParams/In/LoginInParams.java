@@ -6,9 +6,7 @@ import ExerMate.ExerMate.Biz.BizTypeEnum;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 
 
-/**
- * @描述 用户登录的入参
- **/
+
 @BizType(BizTypeEnum.USER_LOGIN)
 public class LoginInParams extends CommonInParams {
 

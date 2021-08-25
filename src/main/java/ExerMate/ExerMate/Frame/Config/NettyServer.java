@@ -76,7 +76,7 @@ public class NettyServer {
                         }
                     });
             ChannelFuture cf = sb.bind().sync(); // 服务器异步创建绑定
-            System.out.println("启动webSocket监听： " + cf.channel().localAddress());
+            System.out.println("websocket시작： " + cf.channel().localAddress());
             cf.channel().closeFuture().sync(); // 关闭服务器通道
         } finally {
             group.shutdownGracefully().sync(); // 释放线程池资源

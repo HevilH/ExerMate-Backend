@@ -26,9 +26,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @描述 事件分发器，根据输入的参数来决定使用哪个类和函数来执行逻辑
- **/
+
 @Component
 public class Dispatcher {
 
@@ -38,13 +36,7 @@ public class Dispatcher {
     @Autowired
     private UserProcessor userProcessor;
 
-    /**
-     * 이벤트 디스패쳐
-     * 모든 비즈니스는 Handler에서 처리후 Controller 내부에서 처리할때 디스패쳐를 꼭 걸쳐야한다
-     * 目前用到分发器的有：①处理web的http请求；②处理socket长连接中客户端发送的请求；③处理定时任务中执行的请求；
-     * 디스패쳐는 비즈니스의 매개변수에 따라 어떤 업무를 어떤 클래스의 어떤 함수에서 진행할지 결정한다
-     * 这只是一个最简单的分发器，可以根据业务逻辑的复杂程度定制不同复杂度的分发器
-     **/
+
     public String dispatch(CommonInParams params) {
         String useremail = params.getUseremail();
         BizTypeEnum bitType = params.getBizType();
@@ -113,7 +105,7 @@ public class Dispatcher {
         }
     }
 
-    /** 根据类名和操作类型获取执行业务的具体函数 */
+
     private Method getMethodByOptType(Class<?> cls, BizTypeEnum bitType) {
         Method method = null;
         Method[] methods = cls.getDeclaredMethods();
@@ -128,7 +120,7 @@ public class Dispatcher {
         return method;
     }
 
-    /** 根据操作类型获取入参类 */
+
     public Class<CommonInParams> getParamByBizType(BizTypeEnum bitType) {
         Reflections reflections = new Reflections(NameConstant.PACKAGE_NAME + ".Biz.Controller.Params");
         /** 根据注解获取入参类 */
@@ -141,7 +133,7 @@ public class Dispatcher {
             if (bizType1.value().equals(bitType))
                 return paramCls;
         }
-        /** 没有找到则认为使用默认入参类 */
+
         return CommonInParams.class;
     }
 }

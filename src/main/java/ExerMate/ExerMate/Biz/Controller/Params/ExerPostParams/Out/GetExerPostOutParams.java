@@ -12,7 +12,7 @@ public class GetExerPostOutParams extends CommonOutParams {
 
     private String exerPlace;
 
-    private Long exerTime;
+    private String exerTime;
 
     private String contents;
 
@@ -33,7 +33,7 @@ public class GetExerPostOutParams extends CommonOutParams {
         this.exerPlace = exerPlace;
     }
 
-    public void setExerTime(Long exerTime) {
+    public void setExerTime(String exerTime) {
         this.exerTime = exerTime;
     }
 

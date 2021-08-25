@@ -32,7 +32,8 @@ public enum BizTypeEnum {
 
     /** websocket 비즈니스 타입*/
     SEND_MSG(ChatRoomController.class, null, "메시지 보내기"),
-    /** 定时任务业务测试 */
+    SEND_IMG(ChatRoomController.class, "chatroom/send-img", "이미지 보내기"),
+
     LOG_TEST(TimerController.class, null, "定时日志测试"),
     ;
 
@@ -43,11 +44,11 @@ public enum BizTypeEnum {
     }
 
 
-    /** 执行业务具体的类 */
+
     Class<?> controller;
-    /** 业务对应的http请求路径 */
+
     String httpPath;
-    /** 业务描述 */
+
     String description;
 
     public Class<?> getControllerClass() {

@@ -22,7 +22,7 @@ public class ExerPostProcessor {
         return mongoTemplate.findOne(query, ExerPost.class);
     }
 
-    public void createExerPost(String useremail,  String exerPostID, String exerName, Long uploadTime, String exerPlace, Long exerTime, int maxNum, String contents){
+    public void createExerPost(String useremail,  String exerPostID, String exerName, Long uploadTime, String exerPlace, String exerTime, int maxNum, String contents){
         ExerPost newExerPost = new ExerPost();
         newExerPost.setExerPostID(exerPostID);
         newExerPost.setUserEmail(useremail);
@@ -35,7 +35,7 @@ public class ExerPostProcessor {
         mongoTemplate.insert(newExerPost, "ExerPost");
     }
 
-    public void modifyExerPost(String exerPostID, String exerName, String exerPlace, Long exerTime, int maxNum, String contents){
+    public void modifyExerPost(String exerPostID, String exerName, String exerPlace, String exerTime, int maxNum, String contents){
         Query query = new Query();
         query.addCriteria(Criteria.where(KeyConstant.EXERPOSTID).is(exerPostID));
         Update update = new Update();

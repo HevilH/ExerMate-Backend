@@ -51,15 +51,12 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
             } catch (Exception e) {
                 throw new CourseWarn(SystemErrorEnum.PARAMS_TRANSFER_ERROR);
             }
-            /** 执行业务的线程存在复用情况，需要清除以前的线程变量 */
             ThreadUtil.clean();
-            /** 保存管道，方便以后对该用户发送消息 */
             ThreadUtil.setCtx(ctx);
-            /** 根据操作类型获取参数 */
             Class<CommonInParams> clz = dispatcher.getParamByBizType(bizTypeEnum);
             CommonInParams params = clz.newInstance();
             params.fromJsonObject(jsonMsg);
-            /** 如果不是登录，需要获取用户信息 */
+
             if (!bizTypeEnum.equals(BizTypeEnum.USER_LOGIN)) {
                 useremail = SocketUtil.getSocketUser(ctx);
                 params.setUseremail(useremail);
@@ -68,10 +65,10 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                 if (useremail == null)
                     throw new CourseWarn(UserWarnEnum.LOGIN_FAILED);
             }
-            /** 执行业务 */
+
             retStr = dispatcher.dispatch(params);
         } catch (Exception e) {
-            /** 处理出错，记录警告日志或者错误日志 */
+
             if (e instanceof CourseWarn) {
                 CourseWarn warn = (CourseWarn)e;
                 retStr = new SysWarnOutParams(warn).toString();

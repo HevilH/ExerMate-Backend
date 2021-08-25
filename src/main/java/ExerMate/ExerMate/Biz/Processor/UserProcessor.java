@@ -12,22 +12,20 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 
-/**
- * @描述 모든 유저의 원자적 트랜잭션을 처리함
- **/
+
 @Component
 public class UserProcessor {
     @Autowired
     MongoTemplate mongoTemplate;
 
-    /**유저이메일에 따라 유저를 찾음*/
+
     public User getUserByUseremail(String useremail) {
         Query query = new Query();
         query.addCriteria(Criteria.where(KeyConstant.USEREMAIL).is(useremail));
         return mongoTemplate.findOne(query, User.class);
     }
 
-    /**새로운 유저 추가*/
+
     public void createUser(String useremail, String password, String nickName) {
         User newUser = new User();
         newUser.setUserEmail(useremail);
@@ -41,12 +39,12 @@ public class UserProcessor {
         mongoTemplate.insert(newUser, "User");
     }
 
-    /**프로필 사진 추가*/
+
     public void setProfile(String useremail) {
         Query query = new Query();
         query.addCriteria(Criteria.where(KeyConstant.USEREMAIL).is(useremail));
         Update update = new Update();
-        update.set("profileRoute", NameConstant.URL_RES_PATH + useremail + ".jpg");
+        update.set("profileRoute", NameConstant.IP_ADDR + NameConstant.URL_RES_PATH + useremail + ".jpg");
         mongoTemplate.updateFirst(query, update, User.class);
     }
 

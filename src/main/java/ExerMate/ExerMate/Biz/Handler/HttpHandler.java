@@ -107,24 +107,20 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             } else {
                 /** 에러처리, 로그기록 */
                 LogUtil.ERROR(null, bizTypeEnum, ParseUtil.getJSONString(requestParams), e);
-                /** 返回客户端INTERNAL_SERVER_ERROR，即服务器内部错误 */
                 retStr = new SysErrorOutParams().toString();
             }
-            /** 将返回结果写入管道 */
             writeResponse(channelHandlerContext, retStr, request);
         }
     }
 
-    /** 解析http请求的参数 */
+
     private JSONObject getRequestParams(FullHttpRequest request) throws IOException {
         JSONObject params = new JSONObject();
 
-        /** 解析请求URI中的参数 */
+
         String uri = request.uri();
         String[] uriParams = uri.split("\\?");
-        /** 保存请求的路径 */
         params.put(KeyConstant.PATH, uriParams[0]);
-        /** 如果uri中存在参数，保存参数列表 */
         if (uriParams.length > 1) {
             String[] paramList = uriParams[1].split("&");
             for (String param:paramList) {
@@ -134,7 +130,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 params.put(keyVal[0], keyVal[1]);
             }
         }
-        /** 解析请求体中的参数 */
+
         HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(new DefaultHttpDataFactory(DefaultHttpDataFactory.MAXSIZE), request);
         if(request.content().isReadable()) {
             String jsonStr = request.content().toString(CharsetUtil.UTF_8);
@@ -148,7 +144,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
         for (InterfaceHttpData data : httpPostData) {
             Object obj = params.get(data.getName());
-            /** 如果之前存了对象，说明传了数组，转化为数组 */
+
             if (obj != null) {
                 if (obj instanceof JSONArray)
                     ((JSONArray) obj).add(data);
@@ -160,12 +156,12 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 }
                 continue;
             }
-            /** 普通属性直接赋值就可以了 */
+
             if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
                 MixedAttribute attribute = (MixedAttribute) data;
                 params.put(attribute.getName(), attribute.getValue());
             } else if (data.getHttpDataType() == InterfaceHttpData.HttpDataType.FileUpload) {
-                /** 文件参数需要特殊处理 */
+
                 FileUpload fileUpload = (FileUpload)data;
                 params.put(data.getName(), fileUpload);
             }
@@ -173,7 +169,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         return params;
     }
 
-    /** 根据httpPath获取对应的业务 */
+
     private BizTypeEnum getBizTypeByPath(String httpPath) {
         BizTypeEnum[] bizTypeEnums = BizTypeEnum.values();
         BizTypeEnum ret = null;
@@ -186,7 +182,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         return ret;
     }
 
-    /** 根据请求的cookie获取HttpSession */
     private void getSession(FullHttpRequest msg) {
         boolean hasPre = false;
         HttpSession httpSession = null;
@@ -195,7 +190,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             Set<Cookie> cookieSet = ServerCookieDecoder.STRICT.decode(cookieStr);
             for (Cookie cookie:cookieSet) {
                 if (cookie.name().equals(NameConstant.HTTP_SESSION_NAME))
-                /** 获取之前的session */
                     if (HttpSession.sessionExist(cookie.value())) {
                         httpSession = HttpSession.getSession(cookie.value());
                         hasPre = true;
@@ -204,16 +198,16 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             }
         }
         hasPreSession.set(hasPre);
-        /** 不存在session需要新建session */
+
         if (httpSession == null)
             httpSession = HttpSession.newSession();
-        /** 将session存到线程变量中 */
+
         ThreadUtil.setHttpSession(httpSession);
     }
 
-    /** 将内容写入返回管道中 */
+
     private void writeResponse(ChannelHandlerContext ctx, String content, FullHttpRequest request) {
-        /** 将字符串写入response中 */
+
         ByteBuf buf = Unpooled.copiedBuffer(content, CharsetUtil.UTF_8);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, buf);
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, NameConstant.DEFAULT_CONTENT);
@@ -223,7 +217,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         if (clientIP != null)
             response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, clientIP);
 
-        /** 如果之前不存在session，需要设置一下session */
         if (!hasPreSession.get()) {
             Cookie cookie = new DefaultCookie(NameConstant.HTTP_SESSION_NAME, ThreadUtil.getHttpSession().getSessionID());
             cookie.setPath("/");
@@ -231,7 +224,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             response.headers().set(HttpHeaderNames.SET_COOKIE,encodeCookie);
         }
 
-        /** 写入管道中 */
+
         ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 }

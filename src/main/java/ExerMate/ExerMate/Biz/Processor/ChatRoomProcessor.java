@@ -1,19 +1,13 @@
 package ExerMate.ExerMate.Biz.Processor;
 
 import ExerMate.ExerMate.Base.Constant.KeyConstant;
-import ExerMate.ExerMate.Base.Constant.NameConstant;
-import ExerMate.ExerMate.Base.Enum.UserType;
 import ExerMate.ExerMate.Base.Model.ChatRoom;
-import ExerMate.ExerMate.Base.Model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component
 public class ChatRoomProcessor {

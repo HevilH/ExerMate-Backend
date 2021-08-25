@@ -10,7 +10,7 @@ public class ExerPost {
     String useremail;
     Long uploadTime;
     String exerPlace;
-    Long exerTime;
+    String exerTime;
     int maxNum;
     String contents;
 
@@ -54,8 +54,8 @@ public class ExerPost {
         this.exerPlace = exerPlace;
     }
 
-    public Long getExerTime() { return exerTime; }
-    public void setExerTime(Long exerTime) {
+    public String getExerTime() { return exerTime; }
+    public void setExerTime(String exerTime) {
         this.exerTime = exerTime;
     }
 

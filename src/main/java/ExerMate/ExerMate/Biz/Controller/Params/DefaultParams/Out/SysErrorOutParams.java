@@ -2,9 +2,7 @@ package ExerMate.ExerMate.Biz.Controller.Params.DefaultParams.Out;
 
 import ExerMate.ExerMate.Biz.Controller.Params.CommonOutParams;
 
-/**
- * @描述 默认系统内部错误返回参数
- **/
+
 public class SysErrorOutParams extends CommonOutParams {
     // 错误编码
     private String code;

@@ -12,7 +12,6 @@ public class SetProfileInParams extends CommonInParams {
     @Required
     private FileUpload file;
 
-    public FileUpload getFile() {
-        return file;
-    }
+
+    public FileUpload getFile() { return file; }
 }

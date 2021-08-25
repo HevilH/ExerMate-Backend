@@ -15,7 +15,7 @@ public class CreateInParams extends CommonInParams {
     private String exerPlace;
 
     @Required
-    private Long exerTime;
+    private String exerTime;
 
     @Required
     private int maxNum;
@@ -40,10 +40,10 @@ public class CreateInParams extends CommonInParams {
         this.exerPlace = exerPlace;
     }
 
-    public Long getExerTime() {
+    public String getExerTime() {
         return exerTime;
     }
-    public void setExerTime(Long exerTime) {
+    public void setExerTime(String exerTime) {
         this.exerTime = exerTime;
     }
 
