@@ -78,6 +78,7 @@ public class ChatRoomController {
         outParams.setBizType("SEND_MSG");
         outParams.setUseremail(useremail);
         outParams.setText(inParams.getText());
+        outParams.setTime(inParams.getTime());
         outParams.setSuccess(true);
         Set<String> chatRoomUsers = redisUtil.getSet(inParams.getChatRoomID());
         for(String chatRoomUser : chatRoomUsers){
@@ -93,10 +94,8 @@ public class ChatRoomController {
         SendImgOutParams outParams = new SendImgOutParams();
         String useremail = inParams.getUseremail();
         FileUpload file = inParams.getFile();
-
         Long uploadTime = System.currentTimeMillis();
         String imgName = useremail +  String.valueOf(uploadTime);
-
         File rawfile = new File(NameConstant.IMG_PATH + imgName + ".jpg");
         rawfile.createNewFile();
         FileChannel inputChannel = new FileInputStream(file.getFile()).getChannel();
@@ -109,7 +108,7 @@ public class ChatRoomController {
             outParams.setBizType("SEND_IMG");
             outParams.setChatRoomID(inParams.getChatRoomID());
             outParams.setUseremail(useremail);
-            outParams.setUrl(NameConstant.IP_ADDR + NameConstant.IMG_PATH + imgName + ".jpg");
+            outParams.setUrl(NameConstant.IP_ADDR + NameConstant.URL_CHAT_PATH+ imgName + ".jpg");
         }
 
         Set<String> chatRoomUsers = redisUtil.getSet(inParams.getChatRoomID());

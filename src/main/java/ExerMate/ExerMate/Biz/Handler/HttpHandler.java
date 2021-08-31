@@ -6,7 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import ExerMate.ExerMate.Base.Constant.KeyConstant;
 import ExerMate.ExerMate.Base.Constant.NameConstant;
 import ExerMate.ExerMate.Biz.BizTypeEnum;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import ExerMate.ExerMate.Base.Error.SystemErrorEnum;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.DefaultParams.Out.SysErrorOutParams;
@@ -76,10 +76,10 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 String path = requestParams.getString(KeyConstant.PATH);
                 bizTypeEnum = getBizTypeByPath(path);
                 if (bizTypeEnum == null)
-                    throw new CourseWarn(SystemErrorEnum.BIZ_TYPE_NOT_EXIST);
+                    throw new ExerMateWarn(SystemErrorEnum.BIZ_TYPE_NOT_EXIST);
                 requestParams.put(KeyConstant.BIZ_TYPE, bizTypeEnum);
             } catch (Exception e) {
-                throw new CourseWarn(SystemErrorEnum.BIZ_TYPE_NOT_EXIST);
+                throw new ExerMateWarn(SystemErrorEnum.BIZ_TYPE_NOT_EXIST);
             }
 
             /** 동작유형에 따른 매개변수 흭득 */
@@ -98,12 +98,12 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             writeResponse(channelHandlerContext, retStr, request);
         } catch (Exception e) {
             String retStr;
-            if (e instanceof CourseWarn) {
-                CourseWarn courseWarn = (CourseWarn)e;
+            if (e instanceof ExerMateWarn) {
+                ExerMateWarn exerMateWarn = (ExerMateWarn)e;
                 /** 오류로그 기록*/
-                LogUtil.WARN(null, bizTypeEnum, ParseUtil.getJSONString(requestParams), courseWarn);
+                LogUtil.WARN(null, bizTypeEnum, ParseUtil.getJSONString(requestParams), exerMateWarn);
                 /**  오류 내용 리턴*/
-                retStr = new SysWarnOutParams(courseWarn).toString();
+                retStr = new SysWarnOutParams(exerMateWarn).toString();
             } else {
                 /** 에러처리, 로그기록 */
                 LogUtil.ERROR(null, bizTypeEnum, ParseUtil.getJSONString(requestParams), e);
@@ -131,7 +131,6 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             }
         }
 
-        HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(new DefaultHttpDataFactory(DefaultHttpDataFactory.MAXSIZE), request);
         if(request.content().isReadable()) {
             String jsonStr = request.content().toString(CharsetUtil.UTF_8);
             try {
@@ -140,6 +139,7 @@ public class HttpHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
             }
         }
+        HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(new DefaultHttpDataFactory(DefaultHttpDataFactory.MAXSIZE), request);
         List<InterfaceHttpData> httpPostData = decoder.getBodyHttpDatas();
 
         for (InterfaceHttpData data : httpPostData) {

@@ -16,7 +16,6 @@ public class TimerJobHandler implements Job {
     @Autowired
     Dispatcher dispatcher;
 
-    /** 处理定时器任务的实际函数 */
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
         CommonInParams params = new CommonInParams();

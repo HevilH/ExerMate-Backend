@@ -2,6 +2,7 @@ package ExerMate.ExerMate.Frame.Util;
 
 import com.alibaba.fastjson.JSONArray;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonOutParams;
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
@@ -37,19 +38,12 @@ public class SocketUtil {
         }
     }
 
-    /** 向单个用户发送单个信息 */
     public static void sendMessageToUser(String username, CommonOutParams msgs) throws Exception {
-        sendMessageToUser(username, Arrays.asList(msgs));
-    }
-
-    /** 向单个用户发送多个信息 */
-    public static void sendMessageToUser(String username, Collection<CommonOutParams> msgs) throws Exception {
         ChannelHandlerContext ctx = socketMap.get(username);
-        JSONArray jsonArray = new JSONArray();
-        for (CommonOutParams commonParams : msgs)
-            jsonArray.add(commonParams.toJsonObject());
         if (ctx != null && ctx.channel().isActive()) {
-            ctx.channel().writeAndFlush(new TextWebSocketFrame(jsonArray.toString()));
+            ctx.channel().writeAndFlush(new TextWebSocketFrame(msgs.toString()));
         }
     }
+
+
 }

@@ -1,16 +1,16 @@
 package ExerMate.ExerMate.Base.Error;
 
-public class CourseWarn extends Exception {
+public class ExerMateWarn extends Exception {
 
     private String errorCode;
     private String errorMsg;
 
-    public CourseWarn(ExceptionInterface exceptionInterface) {
+    public ExerMateWarn(ExceptionInterface exceptionInterface) {
         errorCode = exceptionInterface.getErrorCode();
         errorMsg = exceptionInterface.getErrorMessage();
     }
 
-    public CourseWarn(String code, String msg) {
+    public ExerMateWarn(String code, String msg) {
         errorCode = code;
         errorMsg = msg;
     }

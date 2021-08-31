@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import ExerMate.ExerMate.Base.Annotation.Required;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import ExerMate.ExerMate.Frame.Util.ParseUtil;
 
 import java.lang.reflect.Array;
@@ -73,7 +73,7 @@ public abstract class CommonParams {
                     }
                 }
             } else if (field.isAnnotationPresent(Required.class)) {
-                throw new CourseWarn("default", field.getName() + "을 채워주세요");
+                throw new ExerMateWarn("default", field.getName() + "을 채워주세요");
             }
         }
     }

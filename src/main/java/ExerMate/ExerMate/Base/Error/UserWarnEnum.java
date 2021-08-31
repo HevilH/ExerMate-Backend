@@ -7,7 +7,9 @@ public enum UserWarnEnum implements ExceptionInterface {
 
     PERMISSION_DENIED("UserWarn003", "방문 권한이 없습니다"),
 
-    EXISTED_EMAIL("UserWarn004", "이미 존재하는 이메일입니다")
+    EXISTED_EMAIL("UserWarn004", "이미 존재하는 이메일입니다"),
+
+    JOINED_CHATROOM("UserWarn004", "이미 참가한 채팅방입니다")
     ;
 
     UserWarnEnum(String code, String msg) {

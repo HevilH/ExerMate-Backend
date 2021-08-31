@@ -2,7 +2,7 @@ package ExerMate.ExerMate.Frame.Aspect;
 
 import ExerMate.ExerMate.Base.Annotation.NeedLogin;
 import ExerMate.ExerMate.Base.Enum.UserType;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import ExerMate.ExerMate.Base.Error.UserWarnEnum;
 import ExerMate.ExerMate.Base.Model.User;
 import ExerMate.ExerMate.Frame.Util.ThreadUtil;
@@ -19,7 +19,7 @@ public class LoginAspect {
     public Object around(ProceedingJoinPoint pjp) throws Throwable{
         User user = ThreadUtil.getUser();
         if (user == null)
-            throw new CourseWarn(UserWarnEnum.NEED_LOGIN);
+            throw new ExerMateWarn(UserWarnEnum.NEED_LOGIN);
         MethodSignature signature = (MethodSignature)pjp.getSignature();
         NeedLogin need_login = signature.getMethod().getAnnotation(NeedLogin.class);
         UserType[] userTypes = need_login.value();
@@ -33,7 +33,7 @@ public class LoginAspect {
                 }
             }
             if(!canAccess)
-                throw new CourseWarn(UserWarnEnum.PERMISSION_DENIED);
+                throw new ExerMateWarn(UserWarnEnum.PERMISSION_DENIED);
         }
         return pjp.proceed();
     }

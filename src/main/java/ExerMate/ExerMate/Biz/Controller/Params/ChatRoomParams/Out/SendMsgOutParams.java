@@ -12,6 +12,8 @@ public class SendMsgOutParams extends CommonOutParams {
 
     private String text;
 
+    private Long time;
+
     public void setBizType(String bizType){this.bizType = bizType;}
 
     public void setUseremail(String useremail){this.useremail = useremail;}
@@ -19,4 +21,6 @@ public class SendMsgOutParams extends CommonOutParams {
     public void setChatRoomID(String chatRoomID){this.chatRoomID = chatRoomID;}
 
     public void setText(String text){this.text = text;}
+
+    public void setTime(Long time){this.time = time;}
 }

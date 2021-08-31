@@ -22,7 +22,7 @@ public class User {
         public void setDate(Long date) { this.date = date; }
     }
 
-    public static class ChatRoom {
+    public static class JoinedChatRoom {
 
         String chatRoomID;
 
@@ -44,7 +44,7 @@ public class User {
     String profileRoute;
     String statusMsg;
     WalkNum [] walkRecord;
-    ChatRoom [] chatRooms;
+    JoinedChatRoom [] chatRooms;
     UserType userType;
 
 
@@ -96,11 +96,11 @@ public class User {
     }
     public void initWalkRecord(){this.walkRecord = new WalkNum[0];}
 
-    public ChatRoom[] getChatRooms() { return chatRooms; }
-    public void setChatRooms(ChatRoom[] chatRooms) {
+    public JoinedChatRoom[] getChatRooms() { return chatRooms; }
+    public void setChatRooms(JoinedChatRoom[] chatRooms) {
         this.chatRooms = chatRooms;
     }
-    public void initChatRooms(){this.chatRooms = new ChatRoom[0];}
+    public void initChatRooms(){this.chatRooms = new JoinedChatRoom[0];}
 
     public UserType getUserType() { return userType; }
     public void setUserType(UserType userType) {

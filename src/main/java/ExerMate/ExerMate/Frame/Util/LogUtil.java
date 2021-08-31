@@ -4,8 +4,8 @@ package ExerMate.ExerMate.Frame.Util;
 import ExerMate.ExerMate.Base.Constant.GlobalConstant;
 import ExerMate.ExerMate.Base.Constant.NameConstant;
 import ExerMate.ExerMate.Biz.BizTypeEnum;
-import ExerMate.ExerMate.Base.Error.CourseError;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateError;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 import ExerMate.ExerMate.ExerMateApplication;
 import org.slf4j.Logger;
@@ -27,8 +27,8 @@ public class LogUtil {
                 .append(GlobalConstant.LOG_SPLIT);
         if (error == null)
             sb.append("null");
-        else if (error instanceof CourseError)
-            sb.append(((CourseError)error).getErrorCode());
+        else if (error instanceof ExerMateError)
+            sb.append(((ExerMateError)error).getErrorCode());
         else
             sb.append(error.toString());
         sb.append(GlobalConstant.LOG_SPLIT)
@@ -37,7 +37,7 @@ public class LogUtil {
     }
 
 
-    public static void WARN(String username, BizTypeEnum bizType, Object args, CourseWarn state) {
+    public static void WARN(String username, BizTypeEnum bizType, Object args, ExerMateWarn state) {
         String sb = username + GlobalConstant.LOG_SPLIT +
                 bizType + GlobalConstant.LOG_SPLIT +
                 args.toString() + GlobalConstant.LOG_SPLIT +

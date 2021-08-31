@@ -11,8 +11,6 @@ public class JoinChatRoomInParams extends CommonInParams{
     @Required
     private String chatRoomID;
 
-    @Required
-    private String chatRoomName;
 
 
     public String getChatRoomID() {
@@ -23,11 +21,4 @@ public class JoinChatRoomInParams extends CommonInParams{
         this.chatRoomID = chatRoomID;
     }
 
-    public String getChatRoomName() {
-        return chatRoomName;
-    }
-
-    public void setChatRoomName(String chatRoomName) {
-        this.chatRoomName = chatRoomName;
-    }
 }

@@ -1,17 +1,17 @@
 package ExerMate.ExerMate.Base.Error;
 
-public class CourseError extends Exception {
+public class ExerMateError extends Exception {
 
     private String errorCode;
 
     private String errorMsg;
 
-    public CourseError(ExceptionInterface exceptionInterface) {
+    public ExerMateError(ExceptionInterface exceptionInterface) {
         errorCode = exceptionInterface.getErrorCode();
         errorMsg = exceptionInterface.getErrorMessage();
     }
 
-    public CourseError(String code, String msg) {
+    public ExerMateError(String code, String msg) {
         errorCode = code;
         errorMsg = msg;
     }

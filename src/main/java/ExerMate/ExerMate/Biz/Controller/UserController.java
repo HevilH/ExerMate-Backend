@@ -4,15 +4,18 @@ import ExerMate.ExerMate.Base.Annotation.NeedLogin;
 import ExerMate.ExerMate.Base.Annotation.BizType;
 import ExerMate.ExerMate.Biz.BizTypeEnum;
 import ExerMate.ExerMate.Base.Constant.NameConstant;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import ExerMate.ExerMate.Base.Error.UserWarnEnum;
 import ExerMate.ExerMate.Base.Model.User;
+import ExerMate.ExerMate.Base.Model.ChatRoom;
+
 
 import ExerMate.ExerMate.Biz.Controller.Params.CommonOutParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.GetChatRoomOutParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.SetProfileOutParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.GetDataOutParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.Out.GetWalkRecordOutParams;
+import ExerMate.ExerMate.Biz.Controller.Params.ChatRoomParams.Out.NotifyNewUserOutParams;
 
 import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
 import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.LoginInParams;
@@ -25,6 +28,7 @@ import ExerMate.ExerMate.Biz.Controller.Params.UserParams.In.JoinChatRoomInParam
 import ExerMate.ExerMate.Biz.Processor.UserProcessor;
 import ExerMate.ExerMate.Biz.Processor.ChatRoomProcessor;
 import ExerMate.ExerMate.Frame.Util.RedisUtil;
+import ExerMate.ExerMate.Frame.Util.SocketUtil;
 
 import ExerMate.ExerMate.Frame.Util.*;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,6 +41,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Set;
 
 import java.util.List;
 
@@ -59,10 +64,10 @@ public class UserController {
     public CommonOutParams userLogin(LoginInParams inParams) throws Exception {
         String useremail = inParams.getUseremail();
         if (useremail == null)
-            throw new CourseWarn(UserWarnEnum.LOGIN_FAILED);
+            throw new ExerMateWarn(UserWarnEnum.LOGIN_FAILED);
         User user = userProcessor.getUserByUseremail(useremail);
         if (user == null || !user.getPassword().equals(inParams.getPassword()))
-            throw new CourseWarn(UserWarnEnum.LOGIN_FAILED);
+            throw new ExerMateWarn(UserWarnEnum.LOGIN_FAILED);
 
         /** 로그인성공, 로그인 상태를 기록*/
         ChannelHandlerContext ctx =  ThreadUtil.getCtx();
@@ -78,15 +83,28 @@ public class UserController {
         return new CommonOutParams(true);
     }
 
+    @BizType(BizTypeEnum.USER_LOGOUT)
+    public CommonOutParams userLogout(CommonInParams inParams) throws Exception {
+
+        ChannelHandlerContext ctx =  ThreadUtil.getCtx();
+        if (ctx != null)
+            SocketUtil.removeSocket(ctx);
+        else {
+            HttpSession httpSession = ThreadUtil.getHttpSession();
+            HttpSession.removeSession(httpSession.getSessionID());
+        }
+        return new CommonOutParams(true);
+    }
+
     @BizType(BizTypeEnum.USER_SIGNUP)
     public CommonOutParams userSignup(SignupInParams inParams) throws Exception {
         String useremail = inParams.getUseremail();
         if (useremail == null)
-            throw new CourseWarn(UserWarnEnum.LOGIN_FAILED);
+            throw new ExerMateWarn(UserWarnEnum.LOGIN_FAILED);
 
         User user = userProcessor.getUserByUseremail(useremail);
         if(user != null)
-            throw new CourseWarn(UserWarnEnum.EXISTED_EMAIL);
+            throw new ExerMateWarn(UserWarnEnum.EXISTED_EMAIL);
         userProcessor.createUser(useremail, inParams.getPassword(), inParams.getNickName());
         return new CommonOutParams(true);
     }
@@ -98,7 +116,8 @@ public class UserController {
         SetProfileOutParams outParams = new SetProfileOutParams();
         String useremail = inParams.getUseremail();
         FileUpload file = inParams.getFile();
-        File rawfile = new File(NameConstant.RES_PATH + useremail + ".jpg");
+        String time = String.valueOf(System.currentTimeMillis());
+        File rawfile = new File(NameConstant.RES_PATH + useremail + time + ".jpg");
         rawfile.createNewFile();
         FileChannel inputChannel = new FileInputStream(file.getFile()).getChannel();
         FileChannel outputChannel = new FileOutputStream(rawfile).getChannel();
@@ -110,9 +129,7 @@ public class UserController {
             outParams.setFilename(file.getFilename());
             outParams.setFileSize(file.getFile().length());
         }
-        User nowUser = ThreadUtil.getUser();
-        if(nowUser.getProfileRoute().equals(""))
-            userProcessor.setProfile(useremail);
+        userProcessor.setProfile(useremail, time);
         return outParams;
     }
 
@@ -142,10 +159,26 @@ public class UserController {
     public CommonOutParams userJoinChatRoom(JoinChatRoomInParams inParams) throws Exception {
         String useremail = inParams.getUseremail();
         String chatRoomID = inParams.getChatRoomID();
-        String chatRoomName = inParams.getChatRoomName();
-        userProcessor.joinChatRoom(useremail, chatRoomID, chatRoomName);
+        Set<String> members = redisUtil.getSetMembers(chatRoomID);
+        for (String member: members){
+            if(member.equals(useremail))
+                throw new ExerMateWarn(UserWarnEnum.JOINED_CHATROOM);
+        }
+        User user = ThreadUtil.getUser();
+        ChatRoom chatRoom = chatRoomProcessor.getChatRoomByID(chatRoomID);
+        userProcessor.joinChatRoom(useremail, chatRoomID, chatRoom.getChatRoomName());
         chatRoomProcessor.addGuest(chatRoomID, useremail);
         redisUtil.addToSet(chatRoomID, useremail);
+        NotifyNewUserOutParams outParams = new NotifyNewUserOutParams();
+        outParams.setSuccess(true);
+        outParams.setUseremail(useremail);
+        outParams.setNickName(user.getNickName());
+        outParams.setProfileRoute(user.getProfileRoute());
+        outParams.setBizType("NOTIFY_USER");
+        for (String member: members){
+            if(!member.equals(useremail))
+                SocketUtil.sendMessageToUser(member, outParams);
+        }
         return new CommonOutParams(true);
     }
 
@@ -184,7 +217,7 @@ public class UserController {
     public List<CommonOutParams> userGetChatRoom(CommonInParams inParams) throws Exception {
         List<CommonOutParams> retParams = new ArrayList<>();
         User nowUser = ThreadUtil.getUser();
-        User.ChatRoom [] chatRooms = nowUser.getChatRooms();
+        User.JoinedChatRoom [] chatRooms = nowUser.getChatRooms();
         for (int i = 0; i < chatRooms.length; i++){
             GetChatRoomOutParams outParams = new GetChatRoomOutParams();
             outParams.setChatRoomID(chatRooms[i].getChatRoomID());

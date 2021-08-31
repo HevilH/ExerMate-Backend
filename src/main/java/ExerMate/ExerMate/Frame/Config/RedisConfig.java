@@ -24,7 +24,7 @@ public class RedisConfig {
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
         template.setValueSerializer(jackson2JsonRedisSerializer);
         template.afterPropertiesSet();
-        template.setEnableTransactionSupport(true); //打开事务支持
+        template.setEnableTransactionSupport(true);
         return template;
     }
 

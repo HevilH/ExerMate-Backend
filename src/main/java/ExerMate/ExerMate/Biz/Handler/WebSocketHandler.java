@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import ExerMate.ExerMate.Base.Constant.KeyConstant;
 import ExerMate.ExerMate.Biz.BizTypeEnum;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import ExerMate.ExerMate.Base.Error.SystemErrorEnum;
 import ExerMate.ExerMate.Base.Error.UserWarnEnum;
 import ExerMate.ExerMate.Biz.Controller.Params.CommonInParams;
@@ -40,7 +40,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
         try {
             /** 텍스트형식의 데이터만 처리*/
             if (!(msg instanceof TextWebSocketFrame)) {
-                throw new CourseWarn(SystemErrorEnum.PARAMS_ERROR);
+                throw new ExerMateWarn(SystemErrorEnum.PARAMS_ERROR);
             }
             /** 매개변수를 얻고 비즈니스를 정함 */
             try {
@@ -49,7 +49,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
                 bizTypeEnum = BizTypeEnum.valueOf(bizTypeStr);
                 jsonMsg.put(KeyConstant.BIZ_TYPE, bizTypeEnum);
             } catch (Exception e) {
-                throw new CourseWarn(SystemErrorEnum.PARAMS_TRANSFER_ERROR);
+                throw new ExerMateWarn(SystemErrorEnum.PARAMS_TRANSFER_ERROR);
             }
             ThreadUtil.clean();
             ThreadUtil.setCtx(ctx);
@@ -63,14 +63,14 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
             } else {
                 useremail = params.getUseremail();
                 if (useremail == null)
-                    throw new CourseWarn(UserWarnEnum.LOGIN_FAILED);
+                    throw new ExerMateWarn(UserWarnEnum.LOGIN_FAILED);
             }
 
             retStr = dispatcher.dispatch(params);
         } catch (Exception e) {
 
-            if (e instanceof CourseWarn) {
-                CourseWarn warn = (CourseWarn)e;
+            if (e instanceof ExerMateWarn) {
+                ExerMateWarn warn = (ExerMateWarn)e;
                 retStr = new SysWarnOutParams(warn).toString();
                 LogUtil.WARN(useremail, bizTypeEnum, jsonMsg.toString(), warn);
             } else {

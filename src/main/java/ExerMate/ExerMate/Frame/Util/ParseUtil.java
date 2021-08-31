@@ -3,7 +3,7 @@ package ExerMate.ExerMate.Frame.Util;
 import com.alibaba.fastjson.JSONObject;
 import ExerMate.ExerMate.Base.Constant.GlobalConstant;
 import ExerMate.ExerMate.Base.Constant.NameConstant;
-import ExerMate.ExerMate.Base.Error.CourseWarn;
+import ExerMate.ExerMate.Base.Error.ExerMateWarn;
 import io.netty.handler.codec.http.multipart.FileUpload;
 
 import java.lang.reflect.Field;
@@ -14,11 +14,11 @@ import java.util.List;
 public class ParseUtil {
 
 
-    public static String getWarnStackInfo(CourseWarn courseWarn) {
-        if (courseWarn == null)
+    public static String getWarnStackInfo(ExerMateWarn exerMateWarn) {
+        if (exerMateWarn == null)
             return null;
         String stackInfo = null;
-        StackTraceElement[] stackTrace = courseWarn.getStackTrace();
+        StackTraceElement[] stackTrace = exerMateWarn.getStackTrace();
         for (StackTraceElement stackTraceElement:stackTrace) {
             String className = stackTraceElement.getClassName();
 

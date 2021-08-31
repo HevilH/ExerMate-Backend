@@ -40,11 +40,11 @@ public class UserProcessor {
     }
 
 
-    public void setProfile(String useremail) {
+    public void setProfile(String useremail, String time) {
         Query query = new Query();
         query.addCriteria(Criteria.where(KeyConstant.USEREMAIL).is(useremail));
         Update update = new Update();
-        update.set("profileRoute", NameConstant.IP_ADDR + NameConstant.URL_RES_PATH + useremail + ".jpg");
+        update.set("profileRoute", NameConstant.IP_ADDR + NameConstant.URL_RES_PATH + useremail + time + ".jpg");
         mongoTemplate.updateFirst(query, update, User.class);
     }
 
@@ -68,7 +68,7 @@ public class UserProcessor {
         Query query = new Query();
         query.addCriteria(Criteria.where(KeyConstant.USEREMAIL).is(useremail));
         Update update = new Update();
-        User.ChatRoom chatRoom = new User.ChatRoom();
+        User.JoinedChatRoom chatRoom = new User.JoinedChatRoom();
         chatRoom.setChatRoomID(chatRoomID);
         chatRoom.setChatRoomName(chatRoomName);
         update.push("chatRooms", chatRoom);
